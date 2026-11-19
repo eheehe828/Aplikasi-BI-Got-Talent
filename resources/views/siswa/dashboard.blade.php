@@ -132,6 +132,13 @@
                                     <p><span class="font-semibold">Kelas:</span> {{ $item->kelas }}</p>
                                     <p><span class="font-semibold">No. WhatsApp:</span> {{ $item->no_wa }}</p>
                                 </div>
+
+                                @if ($item->catatan_juri)
+                                    <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded text-sm text-gray-700">
+                                        <p class="font-semibold">Catatan Juri:</p>
+                                        <p>{{ $item->catatan_juri }}</p>
+                                    </div>
+                                @endif
                             </div>
                         @endforeach
                     </div>

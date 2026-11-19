@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth; // Untuk mengecek user yang login
 use App\Http\Controllers\AdminController; // Memanggil Controller Admin
 use App\Http\Controllers\SiswaController; // Memanggil Controller Siswa
+use App\Http\Controllers\JuriController; // Memanggil Controller Juri
 use App\Http\Controllers\ProfileController;
 
 
@@ -14,10 +15,11 @@ Route::get('/', function () {
 
 // 2. Rute "Penyortir" Pintar (Otomatis arahkan sesuai Role sesaat setelah Login)
 Route::get('/dashboard', function () {
-    if (Auth::user()->role === 'admin') {
-        return redirect()->route('admin.dashboard');
-    }
-    return redirect()->route('siswa.dashboard');
+    return match (Auth::user()->role) {
+        'admin' => redirect()->route('admin.dashboard'),
+        'juri'  => redirect()->route('juri.dashboard'),
+        default => redirect()->route('siswa.dashboard'),
+    };
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // 3. JALUR KHUSUS ADMIN
@@ -52,6 +54,12 @@ Route::middleware(['auth', 'role:siswa'])->group(function () {
     
     // Proses Daftar Lomba
     Route::post('/siswa/daftar', [SiswaController::class, 'daftarLomba'])->name('siswa.daftar');
+});
+
+// 5. JALUR KHUSUS JURI (Dijaga oleh Middleware Role:juri)
+Route::middleware(['auth', 'role:juri'])->group(function () {
+    Route::get('/juri/dashboard', [JuriController::class, 'index'])->name('juri.dashboard');
+    Route::post('/juri/pendaftaran/{id}/nilai', [JuriController::class, 'nilai'])->name('juri.nilai');
 });
 
 Route::middleware('auth')->group(function () {
